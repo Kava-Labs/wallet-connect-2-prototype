@@ -93,6 +93,7 @@ function App() {
 
       alert("Success: You just signed a transaction check the console for details!")
     } catch (err) {
+      alert("Error: check console for details!")
       console.log(err);
     }
   };
