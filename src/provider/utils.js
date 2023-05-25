@@ -4,6 +4,8 @@ import SignClient from "@walletconnect/sign-client";
 // @ts-ignore
 const projectId = import.meta.env["VITE_WALLET_CONNECT_PROJECT_ID"];
 
+export const defaultWallet = { address: "", chainId: "", sessionTopic: "", pairingTopic: "" };
+
 export const web3Modal = new Web3Modal({
     walletConnectVersion: 2,
     projectId,
@@ -18,9 +20,6 @@ export const namespaces = {
 }
 
 
-// utils
-export const isSignClientInitialized = (client) => !client ? false : true;
-
 /**
  * @param {string} projectId 
  * @returns {Promise<SignClient>}
@@ -29,6 +28,8 @@ export const initSignClient = async (projectId) => {
     return await SignClient.init({ projectId })
 };
 
+
+export const isSignClientInitialized = (client) => !client ? false : true;
 
 export const establishSession = async (signClient, namespaces) => {
     const { uri, approval } = await signClient.connect({
@@ -72,6 +73,7 @@ export const checkForExistingSessionAndPairing = (signClient) => {
     if (session) {
         const pairing = getActivePairing(signClient);
         if (pairing) {
+            
             return { session, pairing };
         }
     }
@@ -83,25 +85,9 @@ export const establishSessionAndPairing = async (signClient) => {
     if (!signClient) {
         return null;
     }
-    // check for existing connection
-    let mustCreateNewSession = false;
-    let session = getSession(signClient);
-    if (session) {
-        const pairing = getActivePairing(signClient);
-        if (pairing) {
-            console.log("session & pairing active: ", session, pairing);
-        } else {
-            mustCreateNewSession = true;
-        }
-    } else {
-        mustCreateNewSession = true;
-    }
 
-    if (mustCreateNewSession) {
-        session = await establishSession(signClient, namespaces);
-    }
+    const session = await establishSession(signClient, namespaces);
     const pairing = getActivePairing(signClient);
-
     return { session, pairing }
 };
 

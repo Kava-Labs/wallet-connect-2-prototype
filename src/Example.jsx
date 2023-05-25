@@ -3,7 +3,7 @@ import { useWalletProvider } from './provider/WalletProvider';
 
 
 export const Example = () => {
-    const { wallet, connectWallet, signTx } = useWalletProvider();
+    const { wallet, connectWallet, signAmino, disconnectWallet } = useWalletProvider();
     const { address, chainId, sessionTopic, pairingTopic } = wallet;
 
 
@@ -17,8 +17,23 @@ export const Example = () => {
         <button onClick={connectWallet}>
             connect
         </button>
-        <button onClick={signTx}>
+        <button onClick={() => {
+            signAmino({
+                signerAddress: address,
+                signDoc: {
+                    chain_id: chainId,
+                    account_number: "7",
+                    sequence: "54",
+                    memo: "hello, world",
+                    msgs: [],
+                    fee: { "amount": [], "gas": "23" }
+                }
+            })
+        }} disabled={!address}>
             Sign Tx
+        </button>
+        <button onClick={disconnectWallet} disabled={!address}>
+            Disconnect
         </button>
     </>
 
