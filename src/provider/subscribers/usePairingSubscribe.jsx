@@ -24,7 +24,6 @@ export const usePairingSubscribe = (signClient, pairingTopic, setWalletCB) => {
 
         const handlePairingPing = () => {
             console.log("pairing_ping");
-            setWalletCB({ ...defaultWallet });
         };
 
         signClient.core.pairing.events.on("pairing_delete", handlePairingDestroyed);
