@@ -18,59 +18,69 @@ export const useSessionSubscribe = (signClient, sessionTopic, setWalletCB) => {
             return;
         }
 
-        const sessionEventHandler = () => {
-            console.info("session_event");
+        const sessionEventHandler = (ev) => {
+            console.info("session_event: ", ev);
+            alert('received session_event event');
         };
 
-        const sessionUpdateHandler = () => {
-            console.info("session_update");
+        const sessionUpdateHandler = (ev) => {
+            console.info("session_update:", ev);
+            alert('received session_update event');
         };
 
-        const sessionDestroyedHandler = () => {
-            console.info("session_expire", "or", "session_delete", "or", "proposal_expire");
+        const sessionDeletedHandler = (ev) => {
+            console.info("session_delete", ev);
             setWalletCB({ ...defaultWallet });
         };
 
-
-
-        const sessionPingHandler = async () => {
-            console.info("session_ping");
-
+        const sessionExpiredHandler = (ev) => {
+            console.info("session_expire", ev);
+            setWalletCB({ ...defaultWallet });
         };
-        let eventsSet = false;
+
+        const sessionProposalExpire = (ev) => {
+            console.log("proposal_expire", ev);
+            alert("proposal_expire");
+        };
+
+
+        const sessionPingHandler = () => {
+            console.info("session_ping");
+        };
+
         try {
             if (!isSignClientInitialized(signClient)) {
                 return;
             }
-            
+
             if (!sessionTopic) {
                 return;
             }
             // small note(sah): signClient.session.get throws when key is not found
             const session = signClient.session.get(sessionTopic);
-            console.log("got session", session);
+            console.log("subscribing to events on session: ", session);
 
             signClient.on("session_event", sessionEventHandler);
             signClient.on("session_update", sessionUpdateHandler);
-            signClient.on("session_expire", sessionDestroyedHandler);
-            signClient.on("proposal_expire", sessionDestroyedHandler);
-            signClient.on("session_delete", sessionDestroyedHandler);
+            signClient.on("session_expire", sessionExpiredHandler);
+            signClient.on("proposal_expire", sessionProposalExpire);
+            signClient.on("session_delete", sessionDeletedHandler);
             signClient.on("session_ping", sessionPingHandler);
-            eventsSet = true;
         } catch (err) {
             console.warn(err);
-            setWalletCB({...defaultWallet});
+            setWalletCB({ ...defaultWallet });
         }
 
         return () => {
-            if (!eventsSet) {
+            if (!sessionTopic || !signClient) {
                 return;
             }
+            console.info("unsubscribing from sesion: ", sessionTopic);
             signClient.off("session_event", sessionEventHandler);
             signClient.off("session_update", sessionUpdateHandler);
-            signClient.off("session_expire", sessionDestroyedHandler);
-            signClient.off("session_delete", sessionDestroyedHandler);
-            signClient.off("proposal_expire", sessionDestroyedHandler);
+            signClient.off("session_expire", sessionExpiredHandler);
+            signClient.off("session_delete", sessionDeletedHandler);
+            signClient.off("proposal_expire", sessionProposalExpire);
             signClient.off("session_ping", sessionPingHandler);
         }
 

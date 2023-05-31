@@ -12,31 +12,40 @@ import SignClient from "@walletconnect/sign-client";
  */
 
 export const usePairingSubscribe = (signClient, pairingTopic, setWalletCB) => {
+
     useEffect(() => {
-        if (!isSignClientInitialized(signClient)) {
+        if (!isSignClientInitialized(signClient) || !pairingTopic) {
             return;
         }
 
-        const handlePairingDestroyed = () => {
-            console.log("pairing_delete", "or", "pairing_expired");
+        const handlePairingDelete = (ev) => {
+            console.log("pairing_delete", ev);
             setWalletCB({ ...defaultWallet });
         };
+
+        const handlePairingExpired = (ev) => {
+            console.log("pairing_expired", ev);
+            setWalletCB({ ...defaultWallet });
+        };
+
 
         const handlePairingPing = () => {
             console.log("pairing_ping");
         };
 
-        signClient.core.pairing.events.on("pairing_delete", handlePairingDestroyed);
-        signClient.core.pairing.events.on("pairing_expire", handlePairingDestroyed);
+        console.log("subscribing to events on pairing topic: ", pairingTopic);
+        signClient.core.pairing.events.on("pairing_delete", handlePairingDelete);
+        signClient.core.pairing.events.on("pairing_expire", handlePairingExpired);
         signClient.core.pairing.events.on("pairing_ping", handlePairingPing);
 
         return () => {
-            if (!isSignClientInitialized(signClient)) {
+            if (!isSignClientInitialized(signClient) || !pairingTopic) {
                 return;
             }
 
-            signClient.core.pairing.events.off("pairing_delete", handlePairingDestroyed);
-            signClient.core.pairing.events.off("pairing_expire", handlePairingDestroyed);
+            console.log("unsubscribing to events on pairing topic: ", pairingTopic);
+            signClient.core.pairing.events.off("pairing_delete", handlePairingDelete);
+            signClient.core.pairing.events.off("pairing_expire", handlePairingExpired);
             signClient.core.pairing.events.off("pairing_ping", handlePairingPing);
         }
 
