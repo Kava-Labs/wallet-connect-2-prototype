@@ -138,10 +138,13 @@ export const Example = () => {
                     </div>
 
                     {
-                        !wallet.address && <Field label="Enter Namespace:" value={connectTo.cosmos.chains[0]} onChange={(e) => {
+                        !wallet.address && <Field label="Enter Namespace:" value={connectTo.cosmos.chains} onChange={(e) => {
                             setConnectTo((prev) => {
                                 const newNamespace = { ...prev };
-                                newNamespace.cosmos.chains[0] = e.target.value;
+                                
+                                const values = e.target.value.split(',').map(v => v.trim())
+                                
+                                newNamespace.cosmos.chains = values;
                                 return newNamespace;
                             })
                         }} placeholder="cosmos:kava_2222-10" />
