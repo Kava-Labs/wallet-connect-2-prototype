@@ -43,8 +43,8 @@ export const WalletProvider = ({ children }) => {
     }, [signClient]);
 
 
-    useSessionSubscribe(signClient, wallet.sessionTopic, setWallet);
-    usePairingSubscribe(signClient, wallet.pairingTopic, setWallet);
+    const sessionStatus = useSessionSubscribe(signClient, wallet.sessionTopic, setWallet);
+    const pairingStatus = usePairingSubscribe(signClient, wallet.pairingTopic, setWallet);
 
 
     const setExistingWalletIfAvailable = useCallback(() => {
@@ -142,6 +142,8 @@ export const WalletProvider = ({ children }) => {
                 connectWallet,
                 signAmino,
                 disconnectWallet,
+                sessionStatus,
+                pairingStatus,
             }}>
             {children}
         </WalletContext.Provider>

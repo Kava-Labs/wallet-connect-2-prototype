@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useWalletProvider } from './provider/WalletProvider';
 
 
@@ -13,9 +13,9 @@ const defaultNamespace = {
 
 
 
-const Field = ({ label, value, onChange, placeholder }) => {
+const Field = ({ label, value, onChange, placeholder, statusIcon }) => {
     return <div className="field">
-        <label className="label">{label}</label>
+        <label className="label">{label} {statusIcon ? statusIcon : null}</label>
         <div className="control">
             <input className="input" value={value} onChange={onChange} placeholder={placeholder} />
         </div>
@@ -31,9 +31,27 @@ const Button = ({ disabled, label, cb, color }) => {
     </p>
 };
 
+
+const Status = ({ ok, label, lastChecked }) => {
+    return <div className="icon-text">
+        <span>{label} Status: </span>
+        {
+            ok ?
+                <span className="icon has-text-success">
+                    <i className="fas fa-check-square"></i>
+                </span>
+                :
+                <span className="icon has-text-warning">
+                    <i className="fas fa-exclamation-triangle"></i>
+                </span>
+        }
+        <span> Last checked: {lastChecked}</span>
+    </div>
+}
+
 export const Example = () => {
     const [connectTo, setConnectTo] = useState(defaultNamespace);
-    const { wallet, connectWallet, signAmino, disconnectWallet } = useWalletProvider();
+    const { wallet, connectWallet, signAmino, disconnectWallet, sessionStatus, pairingStatus } = useWalletProvider();
     const { address, chainId, sessionTopic, pairingTopic } = wallet;
 
 
@@ -58,16 +76,33 @@ export const Example = () => {
                 <div className="p-6">
                     <Field label="Address" value={address} onChange={() => { }} />
                     <Field label="Chain ID" value={chainId} onChange={() => { }} />
+
+                    {
+                        sessionTopic && sessionStatus &&
+                        <Status ok={sessionStatus.ok} label="Session Topic" lastChecked={sessionStatus.lastChecked} />
+
+                    }
                     <Field label="Session Topic" value={sessionTopic} onChange={() => { }} />
+
+
+                    {
+                        pairingTopic && pairingStatus &&
+                        <Status ok={pairingStatus.ok} label="Pairing Topic" lastChecked={pairingStatus.lastChecked} />
+
+                    }
                     <Field label="Pairing Topic" value={pairingTopic} onChange={() => { }} />
 
-                    <Field label="Connect To" value={connectTo.cosmos.chains[0]} onChange={(e) => {
-                        setConnectTo((prev) => {
-                            const newNamespace = { ...prev };
-                            newNamespace.cosmos.chains[0] = e.target.value;
-                            return newNamespace;
-                        })
-                    }} placeholder="cosmos:kava_2222-10" />
+
+                    {
+                        !wallet.address && <Field label="Connect To" value={connectTo.cosmos.chains[0]} onChange={(e) => {
+                            setConnectTo((prev) => {
+                                const newNamespace = { ...prev };
+                                newNamespace.cosmos.chains[0] = e.target.value;
+                                return newNamespace;
+                            })
+                        }} placeholder="cosmos:kava_2222-10" />
+
+                    }
 
                     <div className="field is-grouped is-justify-content-center">
                         <Button label="Connect" cb={() => {

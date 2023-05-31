@@ -1,6 +1,5 @@
-//@ts-check
-import React, { useEffect } from 'react';
-import { web3Modal, isSignClientInitialized, defaultWallet } from '../utils';
+import React, { useEffect, useState } from 'react';
+import { isSignClientInitialized, defaultWallet, withTimeout } from '../utils';
 import SignClient from "@walletconnect/sign-client";
 
 
@@ -13,6 +12,8 @@ import SignClient from "@walletconnect/sign-client";
  */
 
 export const useSessionSubscribe = (signClient, sessionTopic, setWalletCB) => {
+    const [status, setStatus] = useState(null);
+
     useEffect(() => {
         if (!isSignClientInitialized(signClient)) {
             return;
@@ -31,11 +32,13 @@ export const useSessionSubscribe = (signClient, sessionTopic, setWalletCB) => {
         const sessionDeletedHandler = (ev) => {
             console.info("received event: session_delete", ev);
             setWalletCB({ ...defaultWallet });
+            setStatus(null);
         };
 
         const sessionExpiredHandler = (ev) => {
             console.info("received event: session_expire", ev);
             setWalletCB({ ...defaultWallet });
+            setStatus(null);
         };
 
         const sessionProposalExpire = (ev) => {
@@ -59,6 +62,16 @@ export const useSessionSubscribe = (signClient, sessionTopic, setWalletCB) => {
             // small note(sah): signClient.session.get throws when key is not found
             const session = signClient.session.get(sessionTopic);
             console.log("subscribing to events on session: ", session);
+
+            withTimeout(async () => await signClient.ping({ topic: sessionTopic }))
+                .then(() => setStatus({
+                    ok: true,
+                    lastChecked: new Date().toString(),
+                }))
+                .catch(() => setStatus({
+                    ok: false,
+                    lastChecked: new Date().toString(),
+                }));
 
             signClient.on("session_event", sessionEventHandler);
             signClient.on("session_update", sessionUpdateHandler);
@@ -86,5 +99,41 @@ export const useSessionSubscribe = (signClient, sessionTopic, setWalletCB) => {
 
     }, [signClient, sessionTopic])
 
+
+    useEffect(() => {
+        if (!signClient || !sessionTopic) {
+            return;
+        }
+
+        const id = setInterval(async () => {
+            try {
+             
+                await withTimeout(async () => await signClient.ping({ topic: sessionTopic }));
+                setStatus({
+                    ok: true,
+                    lastChecked: new Date().toString(),
+                })
+            } catch (err) {
+                setStatus({
+                    ok: false,
+                    lastChecked: new Date().toString(),
+                })
+            }
+
+        }, 5000);
+
+        return () => {
+            if (!signClient || !sessionTopic) {
+                return;
+            };
+
+            clearInterval(id);
+        }
+
+
+    }, [signClient, sessionTopic])
+
+
+    return status;
 
 };

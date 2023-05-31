@@ -97,3 +97,27 @@ export const chainIdFromNamespacedAddr = (addressWithNamespace) => {
 export const getSessionAccounts = (session) => {
     return session.namespaces[Object.keys(session.namespaces)[0]].accounts;
 };
+
+
+export const withTimeout = async(
+    promiseFn,
+    timeoutMs = 1000
+  ) => {
+    return new Promise(async (resolve, reject) => {
+      const tid = setTimeout(() => {
+        reject(`timeout after: ${timeoutMs}ms`);
+      }, timeoutMs);
+  
+      try {
+        const res = await promiseFn();
+        resolve(res);
+        clearTimeout(tid);
+        return;
+      } catch (err) {
+        reject(err);
+        clearTimeout(tid);
+        return;
+      }
+    });
+  };
+  
