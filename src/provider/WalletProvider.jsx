@@ -73,7 +73,7 @@ export const WalletProvider = ({ children }) => {
     }, []);
 
 
-    const connectWallet = async () => {
+    const connectWallet = async (namespace) => {
         if (signClient) {
             if (!wallet.address) {
                 const existing = checkForExistingSessionAndPairing(signClient);
@@ -84,7 +84,7 @@ export const WalletProvider = ({ children }) => {
                 }
             }
 
-            const results = await establishSessionAndPairing(signClient);
+            const results = await establishSessionAndPairing(signClient, namespace);
             if (results) {
                 const { session, pairing } = results;
                 updateWalletFromSessionAndPairing(session, pairing);

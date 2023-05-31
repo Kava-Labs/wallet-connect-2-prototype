@@ -1,3 +1,4 @@
+// @ts-check
 import { Web3Modal } from "@web3modal/standalone";
 import SignClient from "@walletconnect/sign-client";
 
@@ -10,14 +11,6 @@ export const web3Modal = new Web3Modal({
     walletConnectVersion: 2,
     projectId,
 });
-// @ts-check
-export const namespaces = {
-    cosmos: {
-        methods: ["cosmos_getAccounts", "cosmos_signDirect", "cosmos_signAmino"],
-        chains: ["cosmos:kava_2222-10"],
-        events: ["chainChanged", "accountsChanged"],
-    },
-}
 
 
 /**
@@ -81,7 +74,7 @@ export const checkForExistingSessionAndPairing = (signClient) => {
     return null;
 }
 
-export const establishSessionAndPairing = async (signClient) => {
+export const establishSessionAndPairing = async (signClient, namespaces) => {
     if (!signClient) {
         return null;
     }
