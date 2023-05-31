@@ -102,8 +102,15 @@ export const WalletProvider = ({ children }) => {
                 }
             });
 
-            signClient.session.getAll().forEach((session) => {
-                signClient.session.delete(session.topic, { code: -1, message: "user disconnected" });
+            signClient.session.getAll().forEach(async (session) => {
+                await signClient.disconnect({
+                    topic: session.topic,
+                    reason: {
+                        code: 6000,
+                        message: "user disconnected",
+                    }
+                })
+
             });
 
         } catch (err) {
