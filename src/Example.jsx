@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useWalletProvider } from './provider/WalletProvider';
 
-
 const defaultNamespace = {
     cosmos: {
         methods: ["cosmos_getAccounts", "cosmos_signDirect", "cosmos_signAmino"],
@@ -9,9 +8,6 @@ const defaultNamespace = {
         events: ["chainChanged", "accountsChanged"],
     },
 }
-
-
-
 
 const Field = ({ label, value, onChange, placeholder, statusIcon }) => {
     return <div className="field">
@@ -92,6 +88,54 @@ export const Example = () => {
                     }
                     <Field label="Pairing Topic" value={pairingTopic} onChange={() => { }} />
 
+
+                    
+
+                    <label className="label">Choose Chain</label>
+
+                    <div style={{ display: 'flex', justifyContent: "center"}}>
+                        <button
+                            style={{ margin: '15px'}}
+                            onClick={
+                                () => {
+                                    setConnectTo((prev) => {
+                                        const newNamespace = { ...prev };
+                                        newNamespace.cosmos.chains = ['cosmos:kava_2222-10'];
+                                        return newNamespace;
+                                    })
+                                }
+                            }
+                        >Kava Chain Only
+                        </button>
+
+                        <button
+                            style={{ margin: '15px'}}
+                            onClick={
+                                () => {
+                                    setConnectTo((prev) => {
+                                        const newNamespace = { ...prev };
+                                        newNamespace.cosmos.chains = ['cosmos:Binance-Chain-Ganges'];
+                                        return newNamespace;
+                                    })
+                                }
+                            }
+                        >Binance Chain Only
+                        </button>
+
+                        <button
+                            style={{ margin: '15px'}}
+                            onClick={
+                                () => {
+                                    setConnectTo((prev) => {
+                                        const newNamespace = { ...prev };
+                                        newNamespace.cosmos.chains = ['cosmos:kava_2222-10', 'cosmos:Binance-Chain-Ganges'];
+                                        return newNamespace;
+                                    })
+                                }
+                            }
+                        >Binance & Kava Chain
+                        </button>
+                    </div>
 
                     {
                         !wallet.address && <Field label="Enter Namespace:" value={connectTo.cosmos.chains[0]} onChange={(e) => {
