@@ -19,18 +19,18 @@ export const usePairingSubscribe = (signClient, pairingTopic, setWalletCB) => {
         }
 
         const handlePairingDelete = (ev) => {
-            console.log("pairing_delete", ev);
+            console.log("received event: pairing_delete", ev);
             setWalletCB({ ...defaultWallet });
         };
 
         const handlePairingExpired = (ev) => {
-            console.log("pairing_expired", ev);
+            console.log("received event: pairing_expired", ev);
             setWalletCB({ ...defaultWallet });
         };
 
 
         const handlePairingPing = () => {
-            console.log("pairing_ping");
+            console.log("received event: pairing_ping");
         };
 
         console.log("subscribing to events on pairing topic: ", pairingTopic);

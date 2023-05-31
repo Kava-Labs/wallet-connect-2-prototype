@@ -20,32 +20,32 @@ export const useSessionSubscribe = (signClient, sessionTopic, setWalletCB) => {
 
         const sessionEventHandler = (ev) => {
             console.info("session_event: ", ev);
-            alert('received session_event event');
+            alert('received event: session_event event');
         };
 
         const sessionUpdateHandler = (ev) => {
-            console.info("session_update:", ev);
-            alert('received session_update event');
+            console.info("received event: session_update:", ev);
+            alert('received event: session_update event');
         };
 
         const sessionDeletedHandler = (ev) => {
-            console.info("session_delete", ev);
+            console.info("received event: session_delete", ev);
             setWalletCB({ ...defaultWallet });
         };
 
         const sessionExpiredHandler = (ev) => {
-            console.info("session_expire", ev);
+            console.info("received event: session_expire", ev);
             setWalletCB({ ...defaultWallet });
         };
 
         const sessionProposalExpire = (ev) => {
-            console.log("proposal_expire", ev);
-            alert("proposal_expire");
+            console.log("received event: proposal_expire", ev);
+            alert("received event: proposal_expire");
         };
 
 
         const sessionPingHandler = () => {
-            console.info("session_ping");
+            console.info("received event: session_ping");
         };
 
         try {
