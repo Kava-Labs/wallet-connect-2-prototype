@@ -95,13 +95,6 @@ export const WalletProvider = ({ children }) => {
 
     const disconnectWallet = useCallback(async () => {
         try {
-            await signClient.disconnect({
-                topic: wallet.sessionTopic, reason: {
-                    code: -1,
-                    message: "user disconnected",
-                }
-            });
-
             signClient.session.getAll().forEach(async (session) => {
                 await signClient.disconnect({
                     topic: session.topic,
