@@ -94,7 +94,7 @@ export const Example = () => {
 
 
                     {
-                        !wallet.address && <Field label="Connect To" value={connectTo.cosmos.chains[0]} onChange={(e) => {
+                        !wallet.address && <Field label="Enter Namespace:" value={connectTo.cosmos.chains[0]} onChange={(e) => {
                             setConnectTo((prev) => {
                                 const newNamespace = { ...prev };
                                 newNamespace.cosmos.chains[0] = e.target.value;
